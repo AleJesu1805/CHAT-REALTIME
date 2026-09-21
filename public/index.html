@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Chat web en tiempo real" />
     <title>Chat Realtime</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app-shell">
@@ -14,7 +14,9 @@
           <div>
             <p class="eyebrow">SALA ABIERTA</p>
             <h1>Chat realtime</h1>
-            <p id="connection-status" class="connection-status">Conectando...</p>
+            <p id="connection-status" class="connection-status">
+              Conectando...
+            </p>
           </div>
           <div class="online-counter">
             <span class="status-dot" aria-hidden="true"></span>
@@ -29,12 +31,33 @@
           </aside>
 
           <section class="conversation" aria-label="Conversacion">
-            <div id="messages" class="messages" aria-live="polite" aria-label="Mensajes"></div>
-            <p id="typing-indicator" class="typing-indicator" aria-live="polite"></p>
+            <div
+              id="messages"
+              class="messages"
+              aria-live="polite"
+              aria-label="Mensajes"
+            ></div>
+            <p
+              id="typing-indicator"
+              class="typing-indicator"
+              aria-live="polite"
+            ></p>
             <form id="message-form" class="message-form">
-              <label class="sr-only" for="message-input">Escribe un mensaje</label>
-              <input id="message-input" name="message" type="text" maxlength="500" placeholder="Escribe un mensaje..." autocomplete="off" disabled />
-              <button type="submit" aria-label="Enviar mensaje" disabled>Enviar</button>
+              <label class="sr-only" for="message-input"
+                >Escribe un mensaje</label
+              >
+              <input
+                id="message-input"
+                name="message"
+                type="text"
+                maxlength="500"
+                placeholder="Escribe un mensaje..."
+                autocomplete="off"
+                disabled
+              />
+              <button type="submit" aria-label="Enviar mensaje" disabled>
+                Enviar
+              </button>
             </form>
           </section>
         </div>
@@ -47,12 +70,19 @@
         <h2>Elige tu nombre</h2>
         <p>Usa un nombre corto para entrar a la sala.</p>
         <label for="username-input">Nombre</label>
-        <input id="username-input" name="username" type="text" maxlength="24" minlength="2" required autocomplete="name" />
+        <input
+          id="username-input"
+          name="username"
+          type="text"
+          maxlength="24"
+          minlength="2"
+          required
+          autocomplete="name"
+        />
         <button type="submit">Entrar al chat</button>
       </form>
     </dialog>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="/app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

@@ -1,4 +1,3 @@
-const socket = io();
 const usernameDialog = document.querySelector("#username-dialog");
 const usernameForm = document.querySelector("#username-form");
 const usernameInput = document.querySelector("#username-input");
@@ -14,8 +13,12 @@ const usernameStorageKey = "chat-username";
 
 let username = "";
 let typingTimeout;
+let socket;
+let reconnectTimer;
 
 const savedUsername = localStorage.getItem(usernameStorageKey)?.trim();
+
+connect();
 
 if (savedUsername && savedUsername.length >= 2) {
   joinChat(savedUsername);
@@ -40,7 +43,7 @@ usernameForm.addEventListener("submit", (event) => {
 
 function joinChat(requestedUsername) {
   username = requestedUsername.slice(0, 24);
-  socket.emit("user:join", username);
+  sendEvent("user:join", username);
   usernameDialog.close();
   messageInput.disabled = false;
   sendButton.disabled = false;
@@ -55,52 +58,90 @@ messageForm.addEventListener("submit", (event) => {
     return;
   }
 
-  socket.emit("chat:message", message);
+  sendEvent("chat:message", message);
   messageInput.value = "";
-  socket.emit("chat:typing", false);
+  sendEvent("chat:typing", false);
 });
 
 messageInput.addEventListener("input", () => {
-  socket.emit("chat:typing", messageInput.value.trim().length > 0);
+  sendEvent("chat:typing", messageInput.value.trim().length > 0);
   clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => socket.emit("chat:typing", false), 1200);
+  typingTimeout = setTimeout(() => sendEvent("chat:typing", false), 1200);
 });
 
-socket.on("connect", () => {
-  connectionStatus.textContent = "Conectado";
-  connectionStatus.classList.add("is-connected");
-});
+function connect() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  socket = new WebSocket(`${protocol}//${window.location.host}`);
 
-socket.on("disconnect", () => {
-  connectionStatus.textContent = "Conexion perdida";
-  connectionStatus.classList.remove("is-connected");
-});
+  socket.addEventListener("open", () => {
+    connectionStatus.textContent = "Conectado";
+    connectionStatus.classList.add("is-connected");
 
-socket.on("users:list", (users) => {
-  onlineCount.textContent = users.length;
-  usersList.replaceChildren(
-    ...users.map((user) => {
-      const item = document.createElement("li");
-      item.className = "user-item";
-      item.innerHTML = `<span class="user-avatar">${escapeHtml(user.charAt(0).toUpperCase())}</span><span>${escapeHtml(user)}</span>`;
-      return item;
-    }),
-  );
-});
+    if (username) {
+      sendEvent("user:join", username);
+    }
+  });
 
-socket.on("chat:message", (message) => {
-  addMessage(message, message.username === username ? "own" : "");
-});
+  socket.addEventListener("message", (event) => {
+    let message;
 
-socket.on("system:message", (message) => {
-  addSystemMessage(message.text);
-});
+    try {
+      message = JSON.parse(event.data);
+    } catch {
+      return;
+    }
 
-socket.on("chat:typing", ({ username: typingUsername, isTyping }) => {
-  typingIndicator.textContent = isTyping
-    ? `${typingUsername} esta escribiendo...`
-    : "";
-});
+    handleEvent(message.event, message.data);
+  });
+
+  socket.addEventListener("close", () => {
+    connectionStatus.textContent = "Conexion perdida";
+    connectionStatus.classList.remove("is-connected");
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 1500);
+  });
+}
+
+function sendEvent(event, data) {
+  if (socket?.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ event, data }));
+  }
+}
+
+function handleEvent(event, data) {
+  if (event === "users:list") {
+    onlineCount.textContent = data.length;
+    usersList.replaceChildren(
+      ...data.map((user) => {
+        const item = document.createElement("li");
+        item.className = "user-item";
+        item.innerHTML = `<span class="user-avatar">${escapeHtml(user.charAt(0).toUpperCase())}</span><span>${escapeHtml(user)}</span>`;
+        return item;
+      }),
+    );
+  }
+
+  if (event === "chat:message") {
+    addMessage(data, data.username === username ? "own" : "");
+  }
+
+  if (event === "chat:history") {
+    messages.replaceChildren();
+    data.forEach((message) => {
+      addMessage(message, message.username === username ? "own" : "");
+    });
+  }
+
+  if (event === "system:message") {
+    addSystemMessage(data.text);
+  }
+
+  if (event === "chat:typing") {
+    typingIndicator.textContent = data.isTyping
+      ? `${data.username} esta escribiendo...`
+      : "";
+  }
+}
 
 function addMessage(message, type) {
   const article = document.createElement("article");

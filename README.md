@@ -1,6 +1,6 @@
 # Chat Realtime
 
-Proyecto base de un chat web en tiempo real construido con Node.js, Express y Socket.IO.
+Proyecto base de un chat web en tiempo real construido con Node.js, Express y WebSocket.
 
 ## Requisitos
 
@@ -30,6 +30,8 @@ npm start
 ```
 
 Abre `http://localhost:3000` en dos pestañas o dispositivos para probar la comunicacion.
+
+Los usuarios y mensajes se guardan en SQLite dentro de `server/data/chat.sqlite`. Al entrar, cada usuario recibe todo el historial disponible.
 
 ## Estructura
 
