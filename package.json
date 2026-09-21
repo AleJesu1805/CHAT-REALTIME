@@ -1,0 +1,24 @@
+{
+  "name": "chat-realtime",
+  "version": "1.0.0",
+  "description": "Chat web en tiempo real con Node.js, Express y Socket.IO",
+  "type": "module",
+  "main": "server/src/server.js",
+  "scripts": {
+    "dev": "node --watch server/src/server.js",
+    "start": "node server/src/server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "socket.io",
+    "chat",
+    "realtime"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}
