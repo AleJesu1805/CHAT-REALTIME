@@ -1,0 +1,14 @@
+services:
+  chat:
+    build: .
+    container_name: chat-realtime
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    volumes:
+      - chat-data:/app/server/data
+    restart: unless-stopped
+
+volumes:
+  chat-data:

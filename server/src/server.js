@@ -6,14 +6,14 @@ import Database from "better-sqlite3";
 import express from "express";
 import { createServer } from "node:http";
 import { WebSocketServer, WebSocket } from "ws";
-
+// hola
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "../..");
 const publicDirectory = path.join(projectRoot, "public");
 const dataDirectory = path.join(projectRoot, "server", "data");
 const databasePath = path.join(dataDirectory, "chat.sqlite");
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 5000;
 
 fs.mkdirSync(dataDirectory, { recursive: true });
 const database = new Database(databasePath);
